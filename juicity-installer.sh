@@ -52,6 +52,8 @@ if [[ -d $INSTALL_DIR && -f $SERVICE_FILE ]]; then
         2)
             read -p "Enter new listen port: " PORT
             sed -i "s/\"listen\": \":.*\"/\"listen\": \":$PORT\"/" $CONFIG_FILE
+            read -p "Enter new SNI: " SNI
+            sed -i "s/\"listen\": \":.*\"/\"listen\": \":${SNI}\"/" CONFIG_FILE
             sudo systemctl restart juicity
             SHARE_LINK=$($JUICITY_SERVER generate-sharelink -c $CONFIG_FILE)
             echo "New Share Link: $SHARE_LINK"
@@ -123,6 +125,8 @@ read -p "Enter listen port (or press enter to randomize between 10000 and 65535)
 echo ""
 [[ -z "$PORT" ]] && PORT=$((RANDOM % 55536 + 10000))
 echo ""
+read -p "Enter SNI: " SNI
+echo ""
 read -p "Enter password (or press enter to generate one): " PASSWORD
 echo ""
 if [[ -z "$PASSWORD" ]]; then
@@ -133,7 +137,7 @@ UUID=$(uuidgen)
 
 # Generate keys
 openssl ecparam -genkey -name prime256v1 -out "$INSTALL_DIR/private.key"
-openssl req -new -x509 -days 36500 -key "$INSTALL_DIR/private.key" -out "$INSTALL_DIR/fullchain.cer" -subj "/CN=www.discord.com"
+openssl req -new -x509 -days 36500 -key ${INSTALL_DIR}/private.key -out ${INSTALL_DIR}/fullchain.cer -subj "/CN=${SNI}"
 
 cat > $CONFIG_FILE <<EOL
 {
