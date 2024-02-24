@@ -53,7 +53,7 @@ if [[ -d $INSTALL_DIR && -f $SERVICE_FILE ]]; then
             read -p "Enter new listen port: " PORT
             sed -i "s/\"listen\": \":.*\"/\"listen\": \":$PORT\"/" $CONFIG_FILE
             read -p "Enter new SNI: " SNI
-            sed -i "s/\"listen\": \":.*\"/\"listen\": \":$SNI\"/" CONFIG_FILE
+            sed -i "s/\"listen\": \":.*\"/\"listen\": \":${SNI}\"/" CONFIG_FILE
             SHARE_LINK=$($JUICITY_SERVER generate-sharelink -c $CONFIG_FILE)
             sudo systemctl restart juicity
             echo "New Share Link: $SHARE_LINK"
